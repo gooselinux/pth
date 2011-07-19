@@ -1,0 +1,41 @@
+diff -Nur pth-2.0.7-orig/pth-config.in pth-2.0.7/pth-config.in
+--- pth-2.0.7-orig/pth-config.in	2006-06-08 19:54:02.000000000 +0200
++++ pth-2.0.7/pth-config.in	2007-10-21 14:06:45.000000000 +0200
+@@ -46,6 +46,19 @@
+ help=no
+ version=no
+ 
++arch=$(uname -i)
++case $arch in
++    x86_64 | ppc64 | ia64 | s390 )
++        pth_ldlibdir="/usr/lib64"
++        if [ "$pth_libdir" == "/usr/lib" ] ; then
++            pth_libdir=${pth_libdir}64
++        fi
++        ;;
++    * )
++        pth_ldlibdir="/usr/lib"
++        ;;
++esac
++
+ usage="pth-config"
+ usage="$usage [--help] [--version] [--all]"
+ usage="$usage [--prefix] [--exec-prefix] [--bindir] [--libdir] [--includedir] [--mandir] [--datadir] [--acdir]"
+@@ -109,11 +122,15 @@
+             output="$output $pth_acdir"
+             ;;
+         --cflags)
+-            output="$output -I$pth_includedir"
++            if [ "$pth_includedir" != "/usr/include" ] ; then
++                output="$output -I$pth_includedir"
++            fi
+             output_extra="$output_extra $pth_cflags"
+             ;;
+         --ldflags)
+-            output="$output -L$pth_libdir"
++            if [ "$pth_libdir" != "$pth_ldlibdir" ] ; then
++                output="$output -L$pth_libdir"
++            fi
+             output_extra="$output_extra $pth_ldflags"
+             ;;
+         --libs)
